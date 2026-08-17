@@ -1,0 +1,76 @@
+{
+  "faqs": [
+    {
+      "id": 1,
+      "category": "Security & Account",
+      "question": "How do I secure my TrustWallet account?",
+      "answer": "TrustWallet uses industry-leading security practices. Create a strong password, enable two-factor authentication, and never share your recovery phrase. Your private keys are stored locally on your device and never transmitted to our servers."
+    },
+    {
+      "id": 2,
+      "category": "Security & Account",
+      "question": "What should I do if I suspect my account is compromised?",
+      "answer": "Immediately change your password and enable 2FA. If you believe your private keys are exposed, transfer your assets to a new wallet. Contact our support team for additional security recommendations."
+    },
+    {
+      "id": 3,
+      "category": "Transaction Issues",
+      "question": "Why is my transaction pending?",
+      "answer": "Transactions can be pending due to network congestion. Check the blockchain explorer with your transaction hash. Most transactions complete within 5-30 minutes depending on gas fees and network speed."
+    },
+    {
+      "id": 4,
+      "category": "Transaction Issues",
+      "question": "How do I increase my transaction speed?",
+      "answer": "You can increase gas fees to prioritize your transaction. Higher gas fees incentivize miners to include your transaction sooner. Check current gas prices on the network before confirming."
+    },
+    {
+      "id": 5,
+      "category": "Wallet Management",
+      "question": "Can I import my wallet from another provider?",
+      "answer": "Yes! You can import wallets using seed phrases, private keys, or watch-only addresses from MetaMask, MyEtherWallet, and other providers. Your funds remain secure as only you control your private keys."
+    },
+    {
+      "id": 6,
+      "category": "Wallet Management",
+      "question": "What should I do if I lose my recovery phrase?",
+      "answer": "Your recovery phrase cannot be recovered. It's stored only on your device. Keep it in a secure, offline location. If lost, you cannot access that wallet. Always maintain backups in secure locations."
+    },
+    {
+      "id": 7,
+      "category": "Token & Assets",
+      "question": "How do I add custom tokens to my wallet?",
+      "answer": "Copy the token contract address and add it manually in your wallet settings. Verify the address is correct on the blockchain explorer to avoid phishing scams. Official tokens are pre-loaded in TrustWallet."
+    },
+    {
+      "id": 8,
+      "category": "Token & Assets",
+      "question": "Why are some of my tokens not showing up?",
+      "answer": "Tokens may not display if they're not enabled in your wallet settings. Go to Settings > Token, find the token, and toggle it on. Ensure you're on the correct blockchain network."
+    },
+    {
+      "id": 9,
+      "category": "Technical Support",
+      "question": "Which blockchains does TrustWallet support?",
+      "answer": "TrustWallet supports Bitcoin, Ethereum, Binance Smart Chain, Polygon, Solana, Cosmos, and 60+ additional blockchains. You can manage multiple chains within a single wallet."
+    },
+    {
+      "id": 10,
+      "category": "Technical Support",
+      "question": "How do I connect my wallet to DeFi applications?",
+      "answer": "Use the WalletConnect feature to securely connect to decentralized applications. Scan the QR code from the dApp or paste the connection link. Always verify the dApp is legitimate before connecting."
+    },
+    {
+      "id": 11,
+      "category": "Technical Support",
+      "question": "Is TrustWallet available on desktop?",
+      "answer": "TrustWallet is primarily a mobile application for iOS and Android. For desktop access, you can use WalletConnect or browser extensions to interact with dApps while keeping your keys on your mobile device."
+    },
+    {
+      "id": 12,
+      "category": "General",
+      "question": "Is my money safe in TrustWallet?",
+      "answer": "Yes. TrustWallet is a non-custodial wallet, meaning you control your private keys and funds. Only you can access your crypto. We never have access to your private keys or recovery phrases."
+    }
+  ]
+}

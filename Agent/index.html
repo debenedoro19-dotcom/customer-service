@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard - TrustWallet Support</title>
+    <link rel="stylesheet" href="../public/styles.css">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+        }
+
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+        }
+
+        /* Sidebar */
+        .dashboard-sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .sidebar-header .logo-icon {
+            font-size: 2rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            padding: 1.5rem 0;
+        }
+
+        .nav-section {
+            margin-bottom: 1rem;
+        }
+
+        .nav-section-title {
+            padding: 0.75rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.7;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: all 250ms ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left-color: white;
+            color: white;
+        }
+
+        .nav-link-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Content */
+        .dashboard-main {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Bar */
+        .dashboard-topbar {
+            background: white;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .topbar-title h1 {
+            font-size: 1.75rem;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .agent-status {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.away {
+            background-color: var(--warning);
+        }
+
+        .status-indicator.offline {
+            background-color: var(--gray);
+        }
+
+        .status-text {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        .agent-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .agent-info {
+            text-align: right;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .agent-role {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--red);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 250ms ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #991b1b;
+        }
+
+        /* Content Area */
+        .dashboard-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--primary);
+            transition: all 250ms ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.85rem;
+            color: var(--green);
+        }
+
+        .stat-change.negative {
+            color: var(--red);
+        }
+
+        /* Chat Sessions */
+        .chat-sessions {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .chat-sessions-header {
+            padding: 1.5rem;
+            background: var(--lighter-gray);
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-sessions-header h2 {
+            font-size: 1.25rem;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .session-list {
+            list-style: none;
+        }
+
+        .session-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--light-gray);
+            cursor: pointer;
+            transition: background 250ms ease;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-item:hover {
+            background-color: var(--lighter-gray);
+        }
+
+        .session-item.active {
+            background-color: rgba(37, 99, 235, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .session-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-connected {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-queued {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .session-info {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .session-email {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .session-preview {
+            color: var(--gray);
+            font-size: 0.85rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 0.5rem;
+        }
+
+        /* Chat Panel */
+        .chat-panel {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+            margin-top: 2rem;
+        }
+
+        .chat-panel-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+
+        .chat-panel-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+
+        .chat-panel-subtext {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .chat-messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: var(--lighter-gray);
+        }
+
+        .chat-message {
+            display: flex;
+            margin-bottom: 1rem;
+            animation: slideIn 300ms ease-out;
+        }
+
+        .chat-message.agent {
+            justify-content: flex-start;
+        }
+
+        .chat-message.customer {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 60%;
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-lg);
+            word-wrap: break-word;
+        }
+
+        .chat-message.agent .message-bubble {
+            background: white;
+            color: var(--dark);
+            border: 1px solid var(--light-gray);
+        }
+
+        .chat-message.customer .message-bubble {
+            background: var(--primary);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+            padding: 0 0.5rem;
+        }
+
+        .chat-panel-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--light-gray);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem;
+            border: 1px solid var(--light-gray);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            transition: border 250ms ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .send-btn {
+            padding: 0.875rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 250ms ease;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: var(--primary-dark);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .no-session {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            text-align: center;
+            height: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-sidebar {
+                width: 240px;
+            }
+
+            .dashboard-main {
+                margin-left: 240px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                flex-direction: column;
+            }
+
+            .dashboard-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .dashboard-main {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar-right {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .chat-panel {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-icon">🛡️</div>
+                <h2>TrustWallet</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-link active" onclick="switchTab('dashboard')">
+                        <span class="nav-link-icon">📊</span>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-link" onclick="switchTab('chats')">
+                        <span class="nav-link-icon">💬</span>
+                        <span>Active Chats</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tools</div>
+                    <a href="#" class="nav-link" onclick="switchTab('knowledge')">
+                        <span class="nav-link-icon">📚</span>
+                        <span>Knowledge Base</span>
+                    </a>
+                    <a href="#" class="nav-link" onclick="switchTab('reports')">
+                        <span class="nav-link-icon">📈</span>
+                        <span>Reports</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-link" onclick="switchTab('settings')">
+                        <span class="nav-link-icon">⚙️</span>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="dashboard-main">
+            <!-- Top Bar -->
+            <div class="dashboard-topbar">
+                <div class="topbar-left">
+                    <div class="topbar-title">
+                        <h1 id="pageTitle">Dashboard</h1>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <div class="agent-status">
+                        <span class="status-indicator online"></span>
+                        <span class="status-text" id="statusText">Online</span>
+                    </div>
+
+                    <div class="agent-menu">
+                        <div class="agent-info">
+                            <div class="agent-name" id="agentName">Agent</div>
+                            <div class="agent-role">Support Agent</div>
+                        </div>
+                        <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="dashboard-content">
+                <!-- Dashboard Tab -->
+                <div id="dashboardTab" class="tab-content" style="display: block;">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Active Chats</div>
+                            <div class="stat-value" id="activeChatCount">0</div>
+                            <div class="stat-change">Real-time conversations</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">Resolved Today</div>
+                            <div class="stat-value" id="resolvedCount">0</div>
+                            <div class="stat-change">✓ High satisfaction rate</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">Avg Response Time</div>
+                            <div class="stat-value" id="avgResponseTime">--</div>
+                            <div class="stat-change">Under 2 minutes</div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">Queue Length</div>
+                            <div class="stat-value" id="queueLength">0</div>
+                            <div class="stat-change">Customers waiting</div>
+                        </div>
+                    </div>
+
+                    <!-- Active Chats Section -->
+                    <div class="chat-sessions">
+                        <div class="chat-sessions-header">
+                            <h2>Active Customer Sessions</h2>
+                        </div>
+
+                        <ul class="session-list" id="sessionsList">
+                            <li class="session-item" style="text-align: center; color: var(--gray); padding: 2rem;">
+                                No active sessions
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Chat Panel -->
+                    <div class="chat-panel">
+                        <div class="chat-panel-header">
+                            <h3 id="chatCustomerName">Select a customer</h3>
+                            <div class="chat-panel-subtext" id="chatCustomerEmail"></div>
+                        </div>
+
+                        <div class="chat-messages-container" id="chatMessagesContainer">
+                            <div class="no-session">
+                                <div>
+                                    <p>👋 Select a customer from the list to start chatting</p>
+                                    <p style="font-size: 0.85rem; opacity: 0.7; margin-top: 1rem;">
+                                        Customers will appear here when they connect
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-panel-footer">
+                            <input type="text" id="chatInput" class="chat-input" placeholder="Type a message..." disabled>
+                            <button id="sendBtn" class="send-btn" onclick="sendAgentMessage()" disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other tabs placeholder -->
+                <div id="chatsTab" class="tab-content" style="display: none;">
+                    <p>Active chats content</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="agent.js"></script>
+</body>
+</html>

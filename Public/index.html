@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Support Center</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <h1>🎯 Support Center</h1>
+            </div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#chat">Chat</a></li>
+                    <li><a href="/agent/login">Agent Login</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>How can we help you today?</h2>
+                <p>Search our FAQ or start a live chat with our support team</p>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Search for answers...">
+                    <button id="searchBtn">Search</button>
+                </div>
+            </section>
+
+            <!-- FAQ Section -->
+            <section id="faq" class="faq-section">
+                <h2>Frequently Asked Questions</h2>
+                <div id="faqContainer" class="faq-container">
+                    <p>Loading FAQ...</p>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section id="chat" class="chat-section">
+                <div class="chat-box">
+                    <div class="chat-header">
+                        <h3>Live Chat Support</h3>
+                        <button id="closeChat" class="close-btn">✕</button>
+                    </div>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="message bot-message">
+                            <p>Hello! How can I help you today?</p>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Type your message...">
+                        <button id="sendBtn">Send</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 Customer Support Center. All rights reserved.</p>
+            <p>Contact us: support@example.com | Phone: 1-800-SUPPORT</p>
+        </footer>
+    </div>
+
+    <script src="chat.js"></script>
+</body>
+</html>
